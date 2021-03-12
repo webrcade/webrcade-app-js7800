@@ -1,0 +1,4 @@
+[submodule "modules/js7800"]
+	path = modules/js7800
+	url = https://github.com/raz0red/js7800.git
+	branch = webrcade
