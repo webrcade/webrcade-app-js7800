@@ -19,7 +19,7 @@ class App extends WebrcadeApp {
     emulator.loadJs7800()
       .then(() => new FetchAppData(rom).fetch())    
       .then(response => response.blob())
-      .then(blob => Unzip.unzip(blob, [".a78", ".bin"], [".a78"]))
+      .then(blob => new Unzip().unzip(blob, [".a78", ".bin"], [".a78"]))
       .then(blob => emulator.setRomBlob(blob))
       .then(() => this.setState({ mode: ModeEnum.LOADED }))
       .catch(msg => {

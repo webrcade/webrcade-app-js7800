@@ -27,9 +27,9 @@ export class Emulator {
     this.romBlob = blob;
   }
   
-  // // | 15       | Console      | Left Difficulty
-  // keyboardData[15] = Kb.isLeftDiffSet();
-  // // | 16       | Console      | Right Difficulty
+  // TODO:
+  // | 15 | Console | Left Difficulty
+  // | 16 | Console | Right Difficulty
 
   pollControls = (input, isDual, isSwap) => {
     const { app, controllers, controller1 } = this;
@@ -106,6 +106,7 @@ export class Emulator {
 
     const props = { noTitle: true };
     Main.init('js7800__target', props);
+    // TODO: High scores support currently disabled
     Main.setHighScoreCallback(new Main.HighScoreCallback());
     Main.setErrorHandler((e) => { app.exit(e); });
     Input.setPollInputCallback(this.pollControls);
@@ -113,7 +114,6 @@ export class Emulator {
 
     try {
         const cart = await this.getCart(romBlob);
-        // TODO: High scores support currently disabled
         Main.startEmulation(cart);
     } catch (e) {
       app.exit(e);
