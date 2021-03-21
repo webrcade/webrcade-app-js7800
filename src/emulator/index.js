@@ -3,6 +3,7 @@ import {
   Controller,
   Controllers,
   DefaultKeyCodeToControlMapping,
+  addDebugDiv
 } from "@webrcade/app-common"
 
 export class Emulator {
@@ -17,6 +18,11 @@ export class Emulator {
     this.js7800 = null;
     this.romBlob = null;
     this.debug = debug;
+    this.debugDiv = null;
+
+    if (this.debug) {
+      this.debugDiv = addDebugDiv();      
+    }
   }
 
   setRomBlob(blob) {      
@@ -104,7 +110,13 @@ export class Emulator {
     const { js7800, romBlob, app } = this;
     const { Main, Region, Input } = js7800;
 
-    const props = { noTitle: true };
+    if (this.debug) {
+      Main.setDebugCallback((dbg) => {
+        this.debugDiv.innerHTML = dbg;
+      });
+    }
+
+    const props = { noTitle: true, debug: this.debug };
     Main.init('js7800__target', props);
     // TODO: High scores support currently disabled
     Main.setHighScoreCallback(new Main.HighScoreCallback());
