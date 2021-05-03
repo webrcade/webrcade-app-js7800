@@ -1,8 +1,13 @@
-import { WebrcadeApp, FetchAppData, Unzip } from '@webrcade/app-common'
+import { 
+  WebrcadeApp, 
+  FetchAppData, 
+  Unzip, 
+  Resources, 
+  TEXT_IDS 
+} from '@webrcade/app-common'
 import { Emulator } from './emulator'
 
 import './App.scss';
-import '@webrcade/app-common/dist/index.css'
 
 class App extends WebrcadeApp {
   emulator = null;
@@ -17,19 +22,24 @@ class App extends WebrcadeApp {
 
     const { appProps, emulator, ModeEnum } = this;
 
-    // Get the ROM location that was specified
-    const rom = appProps.rom;
-    if (!rom) throw new Error("A ROM file was not specified.");
+    try {
+      // Get the ROM location that was specified
+      const rom = appProps.rom;
+      if (!rom) throw new Error("A ROM file was not specified.");
 
-    emulator.loadJs7800()
-      .then(() => new FetchAppData(rom).fetch())    
-      .then(response => response.blob())
-      .then(blob => new Unzip().unzip(blob, [".a78", ".bin"], [".a78"]))
-      .then(blob => emulator.setRomBlob(blob))
-      .then(() => this.setState({ mode: ModeEnum.LOADED }))
-      .catch(msg => {
-        this.exit("Error fetching ROM: " + msg);
-      })
+      emulator.loadJs7800()
+        .then(() => new FetchAppData(rom).fetch())
+        .then(response => response.blob())
+        .then(blob => new Unzip().unzip(blob, [".a78", ".bin"], [".a78"]))
+        .then(blob => emulator.setRomBlob(blob))
+        .then(() => this.setState({ mode: ModeEnum.LOADED }))
+        .catch(msg => {
+          console.error(msg); // TODO: Proper logging
+          this.exit(Resources.getText(TEXT_IDS.ERROR_RETRIEVING_GAME));
+        })
+    } catch (e) {
+      this.exit(e);
+    }
   }
 
   componentDidUpdate() {
@@ -45,7 +55,7 @@ class App extends WebrcadeApp {
 
   renderCanvas() {
     return (
-      <div id="js7800__target"></div>      
+      <div id="js7800__target"></div>
     );
   }
 
@@ -55,6 +65,7 @@ class App extends WebrcadeApp {
 
     return (
       <>
+        { super.render()}
         { mode === ModeEnum.LOADING ? this.renderLoading() : null}
         { mode === ModeEnum.LOADED ? this.renderCanvas() : null}
       </>

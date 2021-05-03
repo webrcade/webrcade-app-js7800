@@ -3,7 +3,9 @@ import {
   Controller,
   Controllers,
   DefaultKeyCodeToControlMapping,
-  addDebugDiv
+  addDebugDiv,
+  Resources, 
+  TEXT_IDS   
 } from "@webrcade/app-common"
 
 export class Emulator {
@@ -120,7 +122,7 @@ export class Emulator {
     Main.init('js7800__target', props);
     // TODO: High scores support currently disabled
     Main.setHighScoreCallback(new Main.HighScoreCallback());
-    Main.setErrorHandler((e) => { app.exit(e); });
+    Main.setErrorHandler((e) => { app.exit(e); /* TODO: What about this */ });
     Input.setPollInputCallback(this.pollControls);
     Region.setPaletteIndex(0);
 
@@ -128,7 +130,8 @@ export class Emulator {
         const cart = await this.getCart(romBlob);
         Main.startEmulation(cart);
     } catch (e) {
-      app.exit(e);
+      console.error(e);
+      app.exit(Resources.getText(TEXT_IDS.ERROR_LOADING_GAME));
     }
   }
 }
