@@ -21,6 +21,8 @@ export class Emulator {
     this.romBlob = null;
     this.debug = debug;
     this.debugDiv = null;
+    this.paused = false;    
+    this.started = false;
 
     if (this.debug) {
       this.debugDiv = addDebugDiv();      
@@ -43,7 +45,22 @@ export class Emulator {
     const { app, controllers, controller1 } = this;
 
     controllers.poll();
+
     for (let i = 0; i < 2; i++) {
+      if (controllers.isControlDown(i, CIDS.ESCAPE)) {
+        if (this.pause(true)) {
+          controllers.waitUntilControlReleased(i, CIDS.ESCAPE)
+            .then(() => controllers.setEnabled(false))
+            .then(() => { app.pause(() => { 
+                controllers.setEnabled(true);
+                this.pause(false); 
+              }); 
+            })
+            .catch((e) => console.error(e))
+          return;
+        }
+      }
+
       const offset = i * 6;
       input[0 + offset] = controllers.isControlDown(i, CIDS.RIGHT) ||
         (isDual && i && controller1.isAxisRight(1));
@@ -54,10 +71,7 @@ export class Emulator {
       input[3 + offset] = controllers.isControlDown(i, CIDS.UP) ||
         (isDual && i && controller1.isAxisUp(1));
       input[4 + offset] = controllers.isControlDown(i, isSwap ? CIDS.B : CIDS.A);
-      input[5 + offset] = controllers.isControlDown(i, isSwap ? CIDS.A : CIDS.B);
-      if (controllers.isControlDown(i, CIDS.ESCAPE)) {
-        app.exit();
-      }
+      input[5 + offset] = controllers.isControlDown(i, isSwap ? CIDS.A : CIDS.B);      
     }
 
     // Reset
@@ -87,6 +101,17 @@ export class Emulator {
     });
   }
 
+  pause(p) {
+    if ((p && !this.paused) || (!p && this.paused)) {
+      const { Main } = this.js7800;
+      this.paused = p;
+      Main.setAllowUnpause(!p);      
+      Main.pause(p);
+      return true;
+    }
+    return false;
+  }
+
   getCart = (blob) => {      
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -111,6 +136,9 @@ export class Emulator {
   async start() {
     const { js7800, romBlob, app } = this;
     const { Main, Region, Input } = js7800;
+
+    if (this.started) return;
+    this.started = true;
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
