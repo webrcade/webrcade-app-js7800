@@ -49,13 +49,13 @@ class App extends WebrcadeApp {
     if (mode === ModeEnum.LOADED) {
       window.focus();
       // Start the emulator
-      emulator.start();
+      emulator.start(this.canvas);
     }
   }
 
   renderCanvas() {
     return (
-      <div id="js7800__target"></div>
+      <div ref={canvas => { this.canvas = canvas; }} id="js7800__target"></div>
     );
   }
 

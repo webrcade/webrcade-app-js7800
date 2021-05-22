@@ -5,7 +5,8 @@ import {
   DefaultKeyCodeToControlMapping,
   addDebugDiv,
   Resources, 
-  TEXT_IDS   
+  TEXT_IDS,
+  hideInactiveMouse
 } from "@webrcade/app-common"
 
 export class Emulator {
@@ -133,12 +134,14 @@ export class Emulator {
     });
   };
 
-  async start() {
+  async start(canvas) {
     const { js7800, romBlob, app } = this;
     const { Main, Region, Input } = js7800;
 
     if (this.started) return;
     this.started = true;
+
+    hideInactiveMouse(canvas);
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
