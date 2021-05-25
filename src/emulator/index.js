@@ -4,46 +4,67 @@ import {
   Controllers,
   DefaultKeyCodeToControlMapping,
   addDebugDiv,
-  Resources, 
+  Resources,
   TEXT_IDS,
-  hideInactiveMouse
+  AppWrapper
 } from "@webrcade/app-common"
 
-export class Emulator {
+export class Emulator extends AppWrapper {
   constructor(app, debug = false) {
-    this.controller1 = new Controller(new DefaultKeyCodeToControlMapping());
-    this.controllers = new Controllers([
-      this.controller1,
-      new Controller()
-    ]);
+    super(app, debug);
 
-    this.app = app;
     this.js7800 = null;
     this.romBlob = null;
-    this.debug = debug;
     this.debugDiv = null;
-    this.paused = false;    
-    this.started = false;
 
     if (this.debug) {
-      this.debugDiv = addDebugDiv();      
+      this.debugDiv = addDebugDiv();
     }
   }
 
-  setRomBlob(blob) {      
-    console.log(blob);  
+  createControllers() {
+    this.controller1 = new Controller(new DefaultKeyCodeToControlMapping());
+    return new Controllers([
+      this.controller1,
+      new Controller()
+    ]);
+  }
+
+  createStorage() {
+    // no storage
+    return null;
+  }
+
+  createVisibilityMonitor() {
+    // no visibility monitor necessary
+    return null;
+  }
+
+  createAudioProcessor() {
+    // no audio processor necessary
+    return null;
+  }
+
+  onPause(p) {
+    const { Main } = this.js7800;
+    Main.setAllowUnpause(!p);
+    Main.pause(p);
+  }
+
+  setRomBlob(blob) {
+    console.log(blob);
     if (blob.size === 0) {
       throw new Error("The size is invalid (0 bytes).");
     }
     this.romBlob = blob;
   }
-  
+
   // TODO:
   // | 15 | Console | Left Difficulty
   // | 16 | Console | Right Difficulty
 
   pollControls = (input, isDual, isSwap) => {
-    const { app, controllers, controller1 } = this;
+    const { controllers, controller1 } = this;
 
     controllers.poll();
 
@@ -51,13 +72,7 @@ export class Emulator {
       if (controllers.isControlDown(i, CIDS.ESCAPE)) {
         if (this.pause(true)) {
           controllers.waitUntilControlReleased(i, CIDS.ESCAPE)
-            .then(() => controllers.setEnabled(false))
-            .then(() => { app.pause(() => { 
-                controllers.setEnabled(true);
-                this.pause(false); 
-              }); 
-            })
-            .catch((e) => console.error(e))
+            .then(() => this.showPauseMenu());
           return;
         }
       }
@@ -72,7 +87,7 @@ export class Emulator {
       input[3 + offset] = controllers.isControlDown(i, CIDS.UP) ||
         (isDual && i && controller1.isAxisUp(1));
       input[4 + offset] = controllers.isControlDown(i, isSwap ? CIDS.B : CIDS.A);
-      input[5 + offset] = controllers.isControlDown(i, isSwap ? CIDS.A : CIDS.B);      
+      input[5 + offset] = controllers.isControlDown(i, isSwap ? CIDS.A : CIDS.B);
     }
 
     // Reset
@@ -81,7 +96,7 @@ export class Emulator {
 
     // Select
     input[13] = controllers.isControlDown(0, CIDS.SELECT) ||
-      controllers.isControlDown(1, CIDS.SELECT);    
+      controllers.isControlDown(1, CIDS.SELECT);
   }
 
   loadJs7800() {
@@ -90,11 +105,11 @@ export class Emulator {
       document.body.appendChild(script);
       script.src = 'js/js7800.min.js';
       script.async = true;
-      script.onload = () => {        
+      script.onload = () => {
         const js7800 = window.js7800;
         if (js7800) {
-          this.js7800 =  js7800;
-          resolve(js7800);          
+          this.js7800 = js7800;
+          resolve(js7800);
         } else {
           reject('An error occurred loading the Atari 7800 module');
         }
@@ -102,25 +117,14 @@ export class Emulator {
     });
   }
 
-  pause(p) {
-    if ((p && !this.paused) || (!p && this.paused)) {
-      const { Main } = this.js7800;
-      this.paused = p;
-      Main.setAllowUnpause(!p);      
-      Main.pause(p);
-      return true;
-    }
-    return false;
-  }
-
-  getCart = (blob) => {      
+  getCart = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => {
         reader.abort();
         reject("Error reading cartridge: " + reader.error);
       };
-  
+
       reader.onload = () => {
         const result = reader.result;
         const len = result.length;
@@ -134,20 +138,19 @@ export class Emulator {
     });
   };
 
-  async start(canvas) {
+  async onStart(canvas) {
     const { js7800, romBlob, app } = this;
-    const { Main, Region, Input } = js7800;
-
-    if (this.started) return;
-    this.started = true;
-
-    hideInactiveMouse(canvas);
+    const { Main, Region, Input, Audio } = js7800;
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
         this.debugDiv.innerHTML = dbg;
       });
     }
+
+    Audio.setCallback((running) => {
+      setTimeout(() => app.setShowOverlay(!running), 50);
+    });
 
     const props = { noTitle: true, debug: this.debug };
     Main.init('js7800__target', props);
@@ -158,8 +161,8 @@ export class Emulator {
     Region.setPaletteIndex(0);
 
     try {
-        const cart = await this.getCart(romBlob);
-        Main.startEmulation(cart);
+      const cart = await this.getCart(romBlob);
+      Main.startEmulation(cart);
     } catch (e) {
       console.error(e);
       app.exit(Resources.getText(TEXT_IDS.ERROR_LOADING_GAME));
