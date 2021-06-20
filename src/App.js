@@ -1,8 +1,9 @@
 import { 
-  WebrcadeApp, 
-  FetchAppData, 
-  Unzip, 
+  FetchAppData,
   Resources, 
+  Unzip, 
+  WebrcadeApp, 
+  LOG,
   TEXT_IDS 
 } from '@webrcade/app-common'
 import { Emulator } from './emulator'
@@ -34,7 +35,7 @@ class App extends WebrcadeApp {
         .then(blob => emulator.setRomBlob(blob))
         .then(() => this.setState({ mode: ModeEnum.LOADED }))
         .catch(msg => {
-          console.error(msg); // TODO: Proper logging
+          LOG.error(msg);
           this.exit(Resources.getText(TEXT_IDS.ERROR_RETRIEVING_GAME));
         })
     } catch (e) {
@@ -44,7 +45,7 @@ class App extends WebrcadeApp {
 
   componentDidUpdate() {
     const { mode } = this.state;
-    const { ModeEnum, emulator } = this;
+    const { emulator, ModeEnum } = this;
 
     if (mode === ModeEnum.LOADED) {
       window.focus();

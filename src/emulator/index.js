@@ -1,12 +1,13 @@
 import {
-  CIDS,
+  addDebugDiv,
+  AppWrapper,
   Controller,
   Controllers,
-  DefaultKeyCodeToControlMapping,
-  addDebugDiv,
-  Resources,
-  TEXT_IDS,
-  AppWrapper
+  DefaultKeyCodeToControlMapping,  
+  Resources,  
+  CIDS,
+  LOG,
+  TEXT_IDS,  
 } from "@webrcade/app-common"
 
 export class Emulator extends AppWrapper {
@@ -52,7 +53,6 @@ export class Emulator extends AppWrapper {
   }
 
   setRomBlob(blob) {
-    console.log(blob);
     if (blob.size === 0) {
       throw new Error("The size is invalid (0 bytes).");
     }
@@ -139,8 +139,8 @@ export class Emulator extends AppWrapper {
   };
 
   async onStart(canvas) {
-    const { js7800, romBlob, app } = this;
-    const { Main, Region, Input, Audio } = js7800;
+    const { app, js7800, romBlob } = this;
+    const { Audio, Input, Main, Region } = js7800;
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
@@ -164,7 +164,7 @@ export class Emulator extends AppWrapper {
       const cart = await this.getCart(romBlob);
       Main.startEmulation(cart);
     } catch (e) {
-      console.error(e);
+      LOG.error(e);
       app.exit(Resources.getText(TEXT_IDS.ERROR_LOADING_GAME));
     }
   }
