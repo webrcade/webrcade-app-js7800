@@ -1,4 +1,4 @@
-# webЯcade: Atari 7800 
+# webЯcade: Atari 7800 Emulator
 
 The Atari 7800 application for [webЯcade](https://www.webrcade.com) is an emulator for the [Atari 7800 ProSystem game console](https://en.wikipedia.org/wiki/Atari_7800).
 
