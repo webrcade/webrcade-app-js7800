@@ -6,10 +6,13 @@ The Atari 7800 application for [webЯcade](https://www.webrcade.com) is an emula
 
 The underlying emulator is a [forked version](https://github.com/raz0red/js7800/tree/webrcade) of [JS7800](https://github.com/raz0red/js7800) by raz0red. [JS7800](https://github.com/raz0red/js7800) is a JavaScript port of the [ProSystem Atari 7800 emulator](https://github.com/gstanton/ProSystem1_3) by Greg Stanton. 
 
-| [![](https://docs.webrcade.com/assets/images/apps/7800.png?raw=full)](https://play.webrcade.com) | 
-|:--:| 
-| *Knight Guy in Low Res World: Castle Days by Vladimir Zuniga* |
-
+<p align="center">
+ <a href="https://play.webrcade.com">
+  <img src="https://docs.webrcade.com/assets/images/apps/7800.png?raw=full?raw=true" width="90%">
+ </a>
+ <br>
+ <i>Knight Guy in Low Res World: Castle Days by Vladimir Zuniga</i>
+</p>
 
 ## Documentation
 
