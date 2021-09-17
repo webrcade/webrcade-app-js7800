@@ -11,7 +11,7 @@ The underlying emulator is a [forked version](https://github.com/raz0red/js7800/
 
 ## Documentation
 
-
+The [Atari 7800 Application Documentation](https://docs.webrcade.com/apps/emulators/7800/) includes [keyboard](https://docs.webrcade.com/apps/emulators/7800/#keyboard) and [gamepad](https://docs.webrcade.com/apps/emulators/7800/#gamepad) control mappings as well as information related to utilizing the emulator within a [webЯcade feed](https://docs.webrcade.com/apps/emulators/7800/#feed). 
 
 ## LICENSE
 
@@ -23,4 +23,4 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ---
 
-The license is limited to the Atari 7800 application for [webЯcade](https://www.webrcade.com). The underlying [JS7800](https://github.com/raz0red/js7800) and [ProSystem](https://github.com/gstanton/ProSystem1_3) projects each retain their own specific licensing.
+The license presented above is limited to the Atari 7800 application for [webЯcade](https://www.webrcade.com). The underlying [JS7800](https://github.com/raz0red/js7800) and [ProSystem](https://github.com/gstanton/ProSystem1_3) projects each retain their own specific licensing.
