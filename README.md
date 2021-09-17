@@ -1,5 +1,7 @@
 # webЯcade Application: Atari 7800 Emulator
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 The Atari 7800 application for [webЯcade](https://www.webrcade.com) is an emulator for the [Atari 7800 ProSystem game console](https://en.wikipedia.org/wiki/Atari_7800).
 
 The underlying emulator is a [forked version](https://github.com/raz0red/js7800/tree/webrcade) of [JS7800](https://github.com/raz0red/js7800) by raz0red. [JS7800](https://github.com/raz0red/js7800) is a JavaScript port of the [ProSystem Atari 7800 emulator](https://github.com/gstanton/ProSystem1_3) by Greg Stanton. 
