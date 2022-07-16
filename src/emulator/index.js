@@ -162,6 +162,8 @@ export class Emulator extends AppWrapper {
     Region.setPaletteIndex(0);
     // Bilinear filter
     Video.setFilterEnabled(settings.isBilinearFilterEnabled());
+    // VSync
+    Main.setVsyncEnabled(settings.isVsyncEnabled());
 
     try {
       const cart = await this.getCart(romBlob);

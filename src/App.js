@@ -41,6 +41,7 @@ class App extends WebrcadeApp {
       emulator.loadJs7800()
         .then(() => settings.load())
         // .then(() => settings.setBilinearFilterEnabled(true))
+        // .then(() => settings.setVsyncEnabled(false))
         .then(() => new FetchAppData(rom).fetch())
         .then(response => response.blob())
         .then(blob => new Unzip().setDebug(this.isDebug()).unzip(blob, extsNotUnique, exts, romNameScorer))
