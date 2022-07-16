@@ -1,13 +1,14 @@
-import { 
+import {
   romNameScorer,
+  settings,
   AppRegistry,
   FetchAppData,
-  Resources, 
-  Unzip, 
-  WebrcadeApp, 
-  APP_TYPE_KEYS,  
+  Resources,
+  Unzip,
+  WebrcadeApp,
+  APP_TYPE_KEYS,
   LOG,
-  TEXT_IDS 
+  TEXT_IDS
 } from '@webrcade/app-common'
 import { Emulator } from './emulator'
 
@@ -26,11 +27,11 @@ class App extends WebrcadeApp {
 
     const { appProps, emulator, ModeEnum } = this;
 
-    // Determine extensions              
-    const exts = 
+    // Determine extensions
+    const exts =
       AppRegistry.instance.getExtensions(APP_TYPE_KEYS.JS7800, true, false);
-    const extsNotUnique = 
-      AppRegistry.instance.getExtensions(APP_TYPE_KEYS.JS7800, true, true);    
+    const extsNotUnique =
+      AppRegistry.instance.getExtensions(APP_TYPE_KEYS.JS7800, true, true);
 
     try {
       // Get the ROM location that was specified
@@ -38,6 +39,8 @@ class App extends WebrcadeApp {
       if (!rom) throw new Error("A ROM file was not specified.");
 
       emulator.loadJs7800()
+        .then(() => settings.load())
+        // .then(() => settings.setBilinearFilterEnabled(true))
         .then(() => new FetchAppData(rom).fetch())
         .then(response => response.blob())
         .then(blob => new Unzip().setDebug(this.isDebug()).unzip(blob, extsNotUnique, exts, romNameScorer))

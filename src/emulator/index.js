@@ -1,13 +1,14 @@
 import {
   addDebugDiv,
+  settings,
   AppWrapper,
   Controller,
   Controllers,
-  DefaultKeyCodeToControlMapping,  
-  Resources,  
+  DefaultKeyCodeToControlMapping,
+  Resources,
   CIDS,
   LOG,
-  TEXT_IDS,  
+  TEXT_IDS,
 } from "@webrcade/app-common"
 
 export class Emulator extends AppWrapper {
@@ -140,7 +141,7 @@ export class Emulator extends AppWrapper {
 
   async onStart(canvas) {
     const { app, js7800, romBlob } = this;
-    const { Audio, Input, Main, Region } = js7800;
+    const { Audio, Input, Main, Region, Video } = js7800;
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
@@ -159,6 +160,8 @@ export class Emulator extends AppWrapper {
     Main.setErrorHandler((e) => { app.exit(e); /* TODO: What about this */ });
     Input.setPollInputCallback(this.pollControls);
     Region.setPaletteIndex(0);
+    // Bilinear filter
+    Video.setFilterEnabled(settings.isBilinearFilterEnabled());
 
     try {
       const cart = await this.getCart(romBlob);
