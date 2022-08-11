@@ -9,7 +9,7 @@ import {
   CIDS,
   LOG,
   TEXT_IDS,
-} from "@webrcade/app-common"
+} from '@webrcade/app-common';
 
 export class Emulator extends AppWrapper {
   constructor(app, debug = false) {
@@ -26,10 +26,7 @@ export class Emulator extends AppWrapper {
 
   createControllers() {
     this.controller1 = new Controller(new DefaultKeyCodeToControlMapping());
-    return new Controllers([
-      this.controller1,
-      new Controller()
-    ]);
+    return new Controllers([this.controller1, new Controller()]);
   }
 
   createStorage() {
@@ -55,7 +52,7 @@ export class Emulator extends AppWrapper {
 
   setRomBlob(blob) {
     if (blob.size === 0) {
-      throw new Error("The size is invalid (0 bytes).");
+      throw new Error('The size is invalid (0 bytes).');
     }
     this.romBlob = blob;
   }
@@ -72,33 +69,46 @@ export class Emulator extends AppWrapper {
     for (let i = 0; i < 2; i++) {
       if (controllers.isControlDown(i, CIDS.ESCAPE)) {
         if (this.pause(true)) {
-          controllers.waitUntilControlReleased(i, CIDS.ESCAPE)
+          controllers
+            .waitUntilControlReleased(i, CIDS.ESCAPE)
             .then(() => this.showPauseMenu());
           return;
         }
       }
 
       const offset = i * 6;
-      input[0 + offset] = controllers.isControlDown(i, CIDS.RIGHT) ||
+      input[0 + offset] =
+        controllers.isControlDown(i, CIDS.RIGHT) ||
         (isDual && i && controller1.isAxisRight(1));
-      input[1 + offset] = controllers.isControlDown(i, CIDS.LEFT) ||
+      input[1 + offset] =
+        controllers.isControlDown(i, CIDS.LEFT) ||
         (isDual && i && controller1.isAxisLeft(1));
-      input[2 + offset] = controllers.isControlDown(i, CIDS.DOWN) ||
+      input[2 + offset] =
+        controllers.isControlDown(i, CIDS.DOWN) ||
         (isDual && i && controller1.isAxisDown(1));
-      input[3 + offset] = controllers.isControlDown(i, CIDS.UP) ||
+      input[3 + offset] =
+        controllers.isControlDown(i, CIDS.UP) ||
         (isDual && i && controller1.isAxisUp(1));
-      input[4 + offset] = controllers.isControlDown(i, isSwap ? CIDS.B : CIDS.A);
-      input[5 + offset] = controllers.isControlDown(i, isSwap ? CIDS.A : CIDS.B);
+      input[4 + offset] = controllers.isControlDown(
+        i,
+        isSwap ? CIDS.B : CIDS.A,
+      );
+      input[5 + offset] = controllers.isControlDown(
+        i,
+        isSwap ? CIDS.A : CIDS.B,
+      );
     }
 
     // Reset
-    input[12] = controllers.isControlDown(0, CIDS.START) ||
+    input[12] =
+      controllers.isControlDown(0, CIDS.START) ||
       controllers.isControlDown(1, CIDS.START);
 
     // Select
-    input[13] = controllers.isControlDown(0, CIDS.SELECT) ||
+    input[13] =
+      controllers.isControlDown(0, CIDS.SELECT) ||
       controllers.isControlDown(1, CIDS.SELECT);
-  }
+  };
 
   loadJs7800() {
     return new Promise((resolve, reject) => {
@@ -123,7 +133,7 @@ export class Emulator extends AppWrapper {
       const reader = new FileReader();
       reader.onerror = () => {
         reader.abort();
-        reject("Error reading cartridge: " + reader.error);
+        reject('Error reading cartridge: ' + reader.error);
       };
 
       reader.onload = () => {
@@ -157,7 +167,9 @@ export class Emulator extends AppWrapper {
     Main.init('js7800__target', props);
     // TODO: High scores support currently disabled
     Main.setHighScoreCallback(new Main.HighScoreCallback());
-    Main.setErrorHandler((e) => { app.exit(e); /* TODO: What about this */ });
+    Main.setErrorHandler((e) => {
+      app.exit(e); /* TODO: What about this */
+    });
     Input.setPollInputCallback(this.pollControls);
     Region.setPaletteIndex(0);
     // Bilinear filter
