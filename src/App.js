@@ -1,5 +1,6 @@
 import {
   romNameScorer,
+  setMessageAnchorId,
   settings,
   AppRegistry,
   FetchAppData,
@@ -20,6 +21,9 @@ class App extends WebrcadeApp {
 
   componentDidMount() {
     super.componentDidMount();
+
+    // Set anchor for messages
+    setMessageAnchorId('js7800__screen');
 
     // Create the emulator
     if (this.emulator === null) {

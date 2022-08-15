@@ -177,6 +177,9 @@ export class Emulator extends AppWrapper {
     // VSync
     Main.setVsyncEnabled(settings.isVsyncEnabled());
 
+    // Enable show message
+    this.setShowMessageEnabled(true);
+
     try {
       const cart = await this.getCart(romBlob);
       Main.startEmulation(cart);
