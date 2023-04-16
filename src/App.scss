@@ -10,8 +10,8 @@ body {
 }
 
 #js7800__inner-container {
-  width: 100vw;
-  height: 100vh;
+  // width: 100vw;
+  // height: 100vh;
   position: relative;
   text-align: left;
 }
@@ -26,10 +26,10 @@ body {
 }
 
 #js7800__screen {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  position: absolute;
+  // top: 50% !important;
+  // left: 50% !important;
+  // transform: translate(-50%, -50%) !important;
+  position: absolute !important;
   width: 96vw !important;
   height: 96vh !important;
   max-width: calc(96vh * 1.333) !important;

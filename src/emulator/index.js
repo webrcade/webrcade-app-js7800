@@ -24,15 +24,19 @@ export class Emulator extends AppWrapper {
     }
   }
 
+  getDefaultAspectRatio() {
+    return 1.333;
+  }
+
   createControllers() {
     this.controller1 = new Controller(new DefaultKeyCodeToControlMapping());
     return new Controllers([this.controller1, new Controller()]);
   }
 
-  createStorage() {
-    // no storage
-    return null;
-  }
+  // createStorage() {
+  //   // no storage
+  //   return null;
+  // }
 
   createVisibilityMonitor() {
     // no visibility monitor necessary
@@ -151,7 +155,7 @@ export class Emulator extends AppWrapper {
 
   async onStart(canvas) {
     const { app, js7800, romBlob } = this;
-    const { Audio, Input, Main, Region, Video } = js7800;
+    const { Audio, Input, Main, Region } = js7800;
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
@@ -165,6 +169,12 @@ export class Emulator extends AppWrapper {
 
     const props = { noTitle: true, debug: this.debug };
     Main.init('js7800__target', props);
+
+    // Update sizing and bilinear
+    this.canvas = document.getElementById("js7800__screen");
+    this.updateBilinearFilter();
+    this.updateScreenSize();
+
     // TODO: High scores support currently disabled
     Main.setHighScoreCallback(new Main.HighScoreCallback());
     Main.setErrorHandler((e) => {
@@ -172,8 +182,6 @@ export class Emulator extends AppWrapper {
     });
     Input.setPollInputCallback(this.pollControls);
     Region.setPaletteIndex(0);
-    // Bilinear filter
-    Video.setFilterEnabled(settings.isBilinearFilterEnabled());
     // VSync
     Main.setVsyncEnabled(settings.isVsyncEnabled());
 

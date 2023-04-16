@@ -4,12 +4,14 @@ import { Component } from 'react';
 import { GamepadControlsTab, KeyboardControlsTab } from './controls';
 
 import {
+  AppSettingsEditor,
   CustomPauseScreen,
   EditorScreen,
   GamepadWhiteImage,
   KeyboardWhiteImage,
   PauseScreenButton,
   Resources,
+  SettingsAppWhiteImage,
   TEXT_IDS,
 } from '@webrcade/app-common';
 
@@ -23,14 +25,15 @@ export class EmulatorPauseScreen extends Component {
 
   ModeEnum = {
     PAUSE: 'pause',
+    SETTINGS: '7800-settings',
     CONTROLS: 'controls',
   };
 
-  ADDITIONAL_BUTTON_REFS = [React.createRef()];
+  ADDITIONAL_BUTTON_REFS = [React.createRef(), React.createRef()];
 
   render() {
     const { ADDITIONAL_BUTTON_REFS, ModeEnum } = this;
-    const { appProps, closeCallback, exitCallback, isEditor, isStandalone } = this.props;
+    const { appProps, closeCallback, emulator, exitCallback, isEditor, isStandalone } = this.props;
     const { mode } = this.state;
 
     return (
@@ -55,6 +58,17 @@ export class EmulatorPauseScreen extends Component {
                   this.setState({ mode: ModeEnum.CONTROLS });
                 }}
               />,
+              <PauseScreenButton
+                imgSrc={SettingsAppWhiteImage}
+                buttonRef={ADDITIONAL_BUTTON_REFS[1]}
+                label="Atari 7800 Settings"
+                onHandlePad={(focusGrid, e) =>
+                  focusGrid.moveFocus(e.type, ADDITIONAL_BUTTON_REFS[1])
+                }
+                onClick={() => {
+                  this.setState({ mode: ModeEnum.SETTINGS });
+                }}
+              />,
             ]}
           />
         ) : null}
@@ -73,6 +87,12 @@ export class EmulatorPauseScreen extends Component {
                 content: <KeyboardControlsTab />,
               },
             ]}
+          />
+        ) : null}
+        {mode === ModeEnum.SETTINGS ? (
+          <AppSettingsEditor
+            emulator={emulator}
+            onClose={closeCallback}
           />
         ) : null}
       </>
