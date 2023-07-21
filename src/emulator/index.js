@@ -61,12 +61,15 @@ export class Emulator extends AppWrapper {
     this.romBlob = blob;
   }
 
-  // TODO:
-  // | 15 | Console | Left Difficulty
-  // | 16 | Console | Right Difficulty
-
   pollControls = (input, isDual, isSwap) => {
     const { controllers, controller1 } = this;
+
+    isDual = this.dualAnalog;
+
+    // | 15 | Console | Left Difficulty
+    input[15] = this.leftSwitch;
+    // | 16 | Console | Right Difficulty
+    input[16] = this.rightSwitch;
 
     controllers.poll();
 
@@ -112,6 +115,11 @@ export class Emulator extends AppWrapper {
     input[13] =
       controllers.isControlDown(0, CIDS.SELECT) ||
       controllers.isControlDown(1, CIDS.SELECT);
+
+    // | 14       | Console      | Pause
+    input[14] =
+      controllers.isControlDown(0, CIDS.Y) ||
+      controllers.isControlDown(1, CIDS.Y);
   };
 
   loadJs7800() {
@@ -130,6 +138,30 @@ export class Emulator extends AppWrapper {
         }
       };
     });
+  }
+
+  getLeftDifficulty() {
+    return this.leftSwitch ? "b" : "a";
+  }
+
+  setLeftDifficulty(v) {
+    return this.leftSwitch = (v === "b" ? true : false);
+  }
+
+  getRightDifficulty() {
+    return this.rightSwitch ? "b" : "a";
+  }
+
+  setRightDifficulty(v) {
+    this.rightSwitch = ( v === "b" ? true : false);
+  }
+
+  isDualAnalog() {
+    return this.dualAnalog;
+  }
+
+  setDualAnalog(v) {
+    this.dualAnalog = v;
   }
 
   getCart = (blob) => {
@@ -155,7 +187,14 @@ export class Emulator extends AppWrapper {
 
   async onStart(canvas) {
     const { app, js7800, romBlob } = this;
-    const { Audio, Input, Main, Region } = js7800;
+    const { Audio, Input, Main, Region, Cartridge } = js7800;
+
+    // Check cloud storage (eliminate delay when showing settings)
+    try {
+      await this.getSaveManager().isCloudEnabled(this.loadMessageCallback);
+    } finally {
+      this.loadMessageCallback(null);
+    }
 
     if (this.debug) {
       Main.setDebugCallback((dbg) => {
@@ -190,10 +229,70 @@ export class Emulator extends AppWrapper {
 
     try {
       const cart = await this.getCart(romBlob);
-      Main.startEmulation(cart);
+      Main.startEmulation(cart, false, (digest) => {
+        this.saveStatePrefix = app.getStoragePath(`${digest}/`)
+        this.leftSwitch = Cartridge.GetLeftSwitch() ? true : false;
+        this.rightSwitch = Cartridge.GetRightSwitch() ? true : false;
+        this.dualAnalog = Cartridge.IsDualAnalog();
+      });
+
     } catch (e) {
       LOG.error(e);
       app.exit(Resources.getText(TEXT_IDS.ERROR_LOADING_GAME));
     }
+  }
+
+  async getStateSlots(showStatus = true) {
+    return await this.getSaveManager().getStateSlots(
+      this.saveStatePrefix, showStatus ? this.saveMessageCallback : null
+    );
+  }
+
+  async saveStateForSlot(slot) {
+    const { js7800 } = this;
+    const { Main } = js7800;
+
+    let s = Main.saveState();
+    s = Uint8Array.from(s);
+
+    try {
+      if (s) {
+        await this.getSaveManager().saveState(
+          this.saveStatePrefix, slot, s,
+          this.canvas,
+          this.saveMessageCallback, null,
+          {aspectRatio: "" + this.getDefaultAspectRatio()});
+      }
+    } catch (e) {
+      LOG.error('Error saving state: ' + e);
+    }
+
+    return true;
+  }
+
+  async loadStateForSlot(slot) {
+    const { js7800 } = this;
+    const { Main } = js7800;
+
+    try {
+      const state = await this.getSaveManager().loadState(
+        this.saveStatePrefix, slot, this.saveMessageCallback);
+      if (state) {
+        Main.loadState(state);
+      }
+    } catch (e) {
+      LOG.error('Error loading state: ' + e);
+    }
+    return true;
+  }
+
+  async deleteStateForSlot(slot, showStatus = true) {
+    try {
+      await this.getSaveManager().deleteState(
+        this.saveStatePrefix, slot, showStatus ? this.saveMessageCallback : null);
+    } catch (e) {
+      LOG.error('Error deleting state: ' + e);
+    }
+    return true;
   }
 }
