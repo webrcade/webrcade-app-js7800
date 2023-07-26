@@ -34,10 +34,10 @@ export class AtariSettingsEditor extends Component {
         leftDiffSwitch: emulator.getLeftDifficulty(),
         rightDiffSwitch: emulator.getRightDifficulty(),
         dualAnalog: emulator.isDualAnalog(),
-    //     origBilinearMode: emulator.getPrefs().isBilinearEnabled(),
-    //     bilinearMode: emulator.getPrefs().isBilinearEnabled(),
-    //     origScreenSize: emulator.getPrefs().getScreenSize(),
-    //     screenSize: emulator.getPrefs().getScreenSize(),
+        origBilinearMode: emulator.getPrefs().isBilinearEnabled(),
+        bilinearMode: emulator.getPrefs().isBilinearEnabled(),
+        origScreenSize: emulator.getPrefs().getScreenSize(),
+        screenSize: emulator.getPrefs().getScreenSize(),
       },
     });
   }
@@ -62,20 +62,20 @@ export class AtariSettingsEditor extends Component {
           emulator.setLeftDifficulty(values.leftDiffSwitch);
           emulator.setRightDifficulty(values.rightDiffSwitch);
           emulator.setDualAnalog(values.dualAnalog);
-        //   let updated = false;
-        //   if (values.origBilinearMode !== values.bilinearMode) {
-        //     emulator.getPrefs().setBilinearEnabled(values.bilinearMode);
-        //     emulator.updateBilinearFilter();
-        //     updated = true;
-        //   }
-        //   if (values.origScreenSize !== values.screenSize) {
-        //     emulator.getPrefs().setScreenSize(values.screenSize);
-        //     emulator.updateScreenSize();
-        //     updated = true;
-        //   }
-        //   if (updated) {
-        //     emulator.getPrefs().save();
-        //   }
+          let updated = false;
+          if (values.origBilinearMode !== values.bilinearMode) {
+            emulator.getPrefs().setBilinearEnabled(values.bilinearMode);
+            emulator.updateBilinearFilter();
+            updated = true;
+          }
+          if (values.origScreenSize !== values.screenSize) {
+            emulator.getPrefs().setScreenSize(values.screenSize);
+            emulator.updateScreenSize();
+            updated = true;
+          }
+          if (updated) {
+            emulator.getPrefs().save();
+          }
           onClose();
         }}
         onClose={onClose}
