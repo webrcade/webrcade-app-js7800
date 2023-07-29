@@ -8,6 +8,7 @@ export class GamepadControlsTab extends ControlsTab {
       <>
         {this.renderControl('start', 'Reset')}
         {this.renderControl('select', 'Select')}
+        {this.renderControl('y', 'Pause')}
         {this.renderControl('dpad', 'Move')}
         {this.renderControl('lanalog', 'Move')}
         {this.renderControl('ranalog', 'Dual analog (if applicable)')}
@@ -24,6 +25,7 @@ export class KeyboardControlsTab extends ControlsTab {
       <>
         {this.renderKey('Enter', 'Reset')}
         {this.renderKey('ShiftRight', 'Select')}
+        {this.renderKey('KeyS', 'Pause')}
         {this.renderKey('ArrowUp', 'Up')}
         {this.renderKey('ArrowDown', 'Down')}
         {this.renderKey('ArrowLeft', 'Left')}
