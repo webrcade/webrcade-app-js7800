@@ -1,7 +1,7 @@
 import {
   addDebugDiv,
   settings,
-  AppWrapper,
+  BasicAppWrapper,
   Controller,
   Controllers,
   DefaultKeyCodeToControlMapping,
@@ -11,9 +11,13 @@ import {
   TEXT_IDS,
 } from '@webrcade/app-common';
 
-export class Emulator extends AppWrapper {
+export class Emulator extends BasicAppWrapper {
   constructor(app, debug = false) {
     super(app, debug);
+
+    // Read by the shared TouchOverlay component (webrcade-app-common) to
+    // reach the running emulator instance.
+    window.emulator = this;
 
     this.js7800 = null;
     this.romBlob = null;
@@ -53,6 +57,12 @@ export class Emulator extends AppWrapper {
     Main.setAllowUnpause(!p);
     Main.pause(p);
   }
+
+  // Base class default pauses on any tap anywhere on screen -- redundant
+  // (and disruptive) now that there's a dedicated Pause button in the
+  // touch overlay. Same override snes9x/fceux/parallel-n64/vba-m/javatari/
+  // Coleco/A5200/Jaguar use for the same reason.
+  createTouchListener() {}
 
   setRomBlob(blob) {
     if (blob.size === 0) {
@@ -120,6 +130,8 @@ export class Emulator extends AppWrapper {
     input[14] =
       controllers.isControlDown(0, CIDS.Y) ||
       controllers.isControlDown(1, CIDS.Y);
+
+    this.onFrame();
   };
 
   loadJs7800() {
