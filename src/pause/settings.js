@@ -38,6 +38,8 @@ export class AtariSettingsEditor extends Component {
         bilinearMode: emulator.getPrefs().isBilinearEnabled(),
         origScreenSize: emulator.getPrefs().getScreenSize(),
         screenSize: emulator.getPrefs().getScreenSize(),
+        origScreenControls: emulator.getPrefs().getScreenControls(),
+        screenControls: emulator.getPrefs().getScreenControls(),
       },
     });
   }
@@ -73,6 +75,11 @@ export class AtariSettingsEditor extends Component {
             emulator.updateScreenSize();
             updated = true;
           }
+          if (values.origScreenControls !== values.screenControls) {
+            emulator.getPrefs().setScreenControls(values.screenControls);
+            emulator.updateOnScreenControls();
+            updated = true;
+          }
           if (updated) {
             emulator.getPrefs().save();
           }
@@ -100,6 +107,7 @@ export class AtariSettingsEditor extends Component {
             label: 'Display Settings',
             content: (
               <AppDisplaySettingsTab
+                showOnScreenControls={true}
                 emulator={emulator}
                 isActive={tabIndex === 1}
                 setFocusGridComps={setFocusGridComps}
